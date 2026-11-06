@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aprende lógica, criterio con IA e inglés. Una misión con evidencia a la vez.">
+  <title>DevQuest — Tu campaña de aprendizaje</title>
+  <script>
+    try { document.documentElement.dataset.theme = localStorage.getItem('dq_theme') === 'light' ? 'light' : 'dark'; }
+    catch { document.documentElement.dataset.theme = 'dark'; }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+  <header class="topbar"><div class="topbar-inner">
+    <a class="wordmark" href="index.html"><span class="brand-symbol" aria-hidden="true">⌘</span> DevQuest<span class="brand-dot">.</span></a>
+    <nav class="nav" aria-label="Secciones">
+      <button data-action="switch-view" data-view="levels" aria-current="page">Campaña</button>
+      <button data-action="switch-view" data-view="speaking">Speaking Lab</button>
+      <button data-action="switch-view" data-view="prompts">Agentes</button>
+    </nav>
+    <div class="stats" aria-label="Progreso de campaña">
+      <span class="stat stat-rank" title="Rango de campaña: sube cada cuatro entregas completadas"><b id="hudRank">Iron</b><span id="hudRankTitle"></span></span>
+      <span class="stat"><b id="hudLevels">0/16</b> niveles</span>
+      <span class="stat"><b id="hudXp">0</b> XP</span>
+      <span class="stat" title="Actividad de inglés: ocho palabras en un día. La calidad se revisa con tu coach."><span aria-hidden="true">ϟ</span> <b id="hudStreak">0</b> <span id="hudStreakUnit">días</span></span>
+    </div>
+    <div class="toolbar"><button class="icon-btn" data-action="toggle-theme" id="themeToggle" aria-label="Cambiar tema">Tema</button>
+      <details class="menu" id="dataMenu"><summary>Datos</summary><div class="menu-panel">
+        <button data-action="export">Exportar progreso (.json)</button>
+        <label for="importInput">Importar respaldo (.json)</label><input type="file" accept=".json,application/json" id="importInput" class="file-input">
+        <hr><button class="danger" data-action="reset-request" id="resetBtn">Reiniciar campaña</button>
+      </div></details>
+    </div>
+  </div><div class="progress-line" aria-hidden="true"><div id="hudProgress"></div></div></header>
+  <main id="main" tabindex="-1">
+    <section id="view-levels" aria-label="Campaña de aprendizaje">
+      <div class="campaign-overview" id="campaignOverview"></div>
+      <div id="legacyNotice" class="legacy-notice" hidden><p>Tu progreso anterior está conservado como historial. Esta campaña tiene retos nuevos y comienza por separado.</p><button class="btn btn-small" data-action="export-legacy">Descargar historial anterior</button></div>
+      <div class="levels-layout">
+        <aside class="level-nav" aria-label="Mapa de campaña"><div class="sidebar-title"><span class="eyebrow">MAPA DE MISIONES</span><span>16 niveles</span></div><div id="levelNav"></div><p class="sidebar-note">Explora libremente. Gana XP con entregas y revisión.</p></aside>
+        <article class="level-page" id="levelPage"></article>
+        <aside class="growth-panel" aria-label="Evidencia de avance">
+          <div class="panel-heading"><span class="eyebrow">TU PROGRESO</span><h2>Lo que practicas</h2></div><div id="skillPanel"></div><p class="field-help">Misiones revisadas por habilidad. No es una calificación automática.</p>
+          <div class="panel-heading milestone-title"><span class="eyebrow">HITOS DE CAMPAÑA</span><h2>Gánatelo con evidencia</h2></div><div id="milestonePanel"></div>
+          <div class="learning-rule"><span aria-hidden="true">↗</span><p>Avanzar es poder explicarlo, comprobarlo y aplicarlo otra vez.</p></div>
+        </aside>
+      </div>
+    </section>
+    <section id="view-speaking" hidden aria-labelledby="speakingTitle">
+      <div class="page-head"><span class="eyebrow">ENGLISH / ACTIVE PRACTICE</span><h1 id="speakingTitle">Tu voz también sube de nivel.</h1><p>Explica algo que hiciste, responde una pregunta y mejora con el coach. El dictado transcribe; los avisos detectan algunos patrones, no evalúan toda tu gramática ni pronunciación.</p></div>
+      <div class="speaking-layout"><div class="recorder">
+        <div class="recorder-head"><h2>Standup de 60 segundos</h2><span class="timer" id="standupTimer">1:00</span></div>
+        <div class="field-row"><div class="button-group"><button class="btn btn-primary" data-action="timer-start">Empezar práctica</button><button class="btn btn-quiet" data-action="timer-reset">Reiniciar</button></div><button class="btn mic-btn" data-action="mic" data-target="labTranscript"><span class="rec-dot"></span><span class="mic-label">Grabar</span></button></div>
+        <label class="field-label" for="labTranscript">My practice</label><textarea id="labTranscript" data-field="lab" rows="8" lang="en" placeholder="Describe a real task, decision, or bug. Speak or type."></textarea>
+        <div class="field-row"><div class="metrics" id="labTranscript-metrics"></div><button class="btn btn-small" data-action="copy-lab">Llevar al coach ↗</button></div><div class="tips" id="labTranscript-tips"></div><p class="field-help">Ocho palabras registran actividad. Lleva la práctica al coach y haz un segundo intento.</p>
+      </div><div id="drillList"></div></div>
+    </section>
+    <section id="view-prompts" hidden aria-labelledby="agentsTitle">
+      <div class="page-head"><span class="eyebrow">AI / CONVERSACIONES CON PROPÓSITO</span><h1 id="agentsTitle">Un copiloto. Tu criterio.</h1><p>Copia un prompt al chat del agente. La plataforma prepara tu entrega; la conversación y revisión ocurren allí.</p></div>
+      <div class="prompt-list">
+        <article class="prompt-card"><h2>Arrancar con una pregunta</h2><p>Primero tu razonamiento; luego la ayuda que necesitas.</p><pre id="promptStart">@02-socratic-fullstack.md @04-english-coach.md @AGENTS.md
+
+Mi nivel y objetivo: [completar]. Mi plan: [mis pasos].
+Revisa mi descomposición y haz una pregunta por turno.
+No escribas ni completes código de /workspaces/.
+Comprueba entradas, decisiones, resultados y un caso límite.
+Al final revisa mi standup, pregunta algo nuevo en inglés y espera mi segundo intento.</pre><button class="btn btn-small" data-action="copy-block" data-target="promptStart">Copiar prompt ↗</button></article>
+        <article class="prompt-card"><h2>Revisar sin delegar la decisión</h2><p>Conecta cada sugerencia con una observación.</p><pre id="promptReview">@02-socratic-fullstack.md @AGENTS.md
+
+Revisa mis archivos o diff en modo lectura.
+Objetivo: [completar]. Criterios: [completar].
+Mi predicción: [completar]. Evidencia: [completar].
+No reescribas ni resuelvas mi código. Señala una suposición mediante una pregunta.
+Distingue lo comprobado de lo inferido.
+Pídeme una prueba que pueda confirmar o contradecir la propuesta.</pre><button class="btn btn-small" data-action="copy-block" data-target="promptReview">Copiar prompt ↗</button></article>
+        <article class="prompt-card"><h2>English: explain, respond, retry</h2><p>Claridad, una corrección y otra oportunidad de usarla.</p><pre id="promptEnglish">@04-english-coach.md
+
+My standup: [my 1–3 sentences].
+Corrige con lenguaje claro y natural, conservando lo que quise decir.
+Explica una corrección y pregunta algo nuevo en inglés sin responderlo.
+Espera mi respuesta y segundo intento. Comprueba si apliqué el feedback.
+Si revisas un commit, comprueba su inglés y que describa el cambio real.</pre><button class="btn btn-small" data-action="copy-block" data-target="promptEnglish">Copiar prompt ↗</button></article>
+      </div>
+    </section>
+    <noscript>Activa JavaScript para usar las misiones y guardar tu progreso en este navegador.</noscript>
+  </main>
+  <footer class="site-footer"><span>DevQuest<span class="brand-dot">.</span> Aprende haciendo.</span><span>Tu código. Tus decisiones. Tu progreso.</span></footer>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <dialog id="celebration" aria-label="Misión completada"><button class="dialog-close icon-btn" data-action="celebration-close" aria-label="Cerrar celebración">×</button><div id="celebrationContent"></div><button class="btn btn-primary" id="celebrationNext" data-action="celebration-next">Siguiente misión →</button></dialog>
+  <script src="data/curriculum.js"></script><script src="js/speech-lab.js"></script><script src="js/app.js"></script>
+</body>
+</html>
